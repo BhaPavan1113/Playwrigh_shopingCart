@@ -18,7 +18,7 @@ class cartPage {
     if (cartProductNames.includes(productName)) {
       await this.checkoutButton.click();
     }
-
+    await this.selectCountry.waitFor({ state: 'visible' });
     await this.selectCountry.pressSequentially("ind");
     const dropdown = this.page.locator(".ta-results");
     await dropdown.waitFor();
