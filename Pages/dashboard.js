@@ -5,18 +5,21 @@ class dashboardPage {
   }
 
   async addtocart(productName) {
+    await this.products.first().waitFor({ state: "visible" });
     const productCount = await this.products.count();
 
     for (let i = 0; i < productCount; i++) {
-      const pName = await this.products.nth(i).locator("b").textContent();
-      if (pName === productName) {
+      const pName = (await this.products.nth(i).locator("b").textContent())?.trim();
+      if (pName?.toLowerCase() === productName.trim().toLowerCase()) {
         await this.products
           .nth(i)
           .getByRole("button", { name: " Add To Cart" })
           .click();
-        break;
+        return;
       }
     }
+
+    throw new Error(`Product "${productName}" was not found on the dashboard.`);
   }
 }
 
