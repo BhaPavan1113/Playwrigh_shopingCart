@@ -39,6 +39,9 @@ jobs:
       - name: Run Cucumber tests
         run: npm run test:cucumber
 
+      - name: Run playwright tests
+        run: npx playwright test tests/opencartdemo.spec.js --headed
+
       - name: Upload Cucumber report
         if: always()
         uses: actions/upload-artifact@v4
