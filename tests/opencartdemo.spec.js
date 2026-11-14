@@ -1,8 +1,5 @@
 const {test, expect} = require('@playwright/test');
-const {loginPage} = require('../Pages/login')
-const {dashboardPage} = require('../Pages/dashboard')
-const {cartPage} = require('../Pages/cart');
-const { orderPage } = require('../Pages/order');
+
 
 const {pageObjectManager} = require('../Pages/POManager')
 
