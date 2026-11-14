@@ -1,3 +1,4 @@
+@smoke
 Feature: Shopping Cart
     Scenario Outline: End to end testing of shopping cart
         Given User is on the login page

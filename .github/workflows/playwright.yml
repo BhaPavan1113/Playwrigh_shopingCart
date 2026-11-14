@@ -1,27 +1,61 @@
+
 name: Playwright Tests
+
 on:
   push:
-    branches: [ main, master ]
+    branches:
+      - master
+
   pull_request:
-    branches: [ main, master ]
+    branches:
+      - master
+
+  workflow_dispatch:
+    inputs:
+      test_suite:
+        description: Test suite to run
+        type: choice
+        options:
+          - all
+          - playwright
+          - cucumber
+        default: all
+        required: true
+
 jobs:
   test:
     timeout-minutes: 60
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
+
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with:
-        node-version: lts/*
-    - name: Install dependencies
-      run: npm ci
-    - name: Install Playwright Browsers
-      run: npx playwright install --with-deps
-    - name: Run Playwright tests
-      run: npx playwright test
-    - uses: actions/upload-artifact@v4
-      if: ${{ !cancelled() }}
-      with:
-        name: playwright-report
-        path: playwright-report/
-        retention-days: 30
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        run: npx playwright install chromium
+
+      - name: Run Playwright tests
+        if: github.event_name != 'workflow_dispatch' || inputs.test_suite == 'playwright' || inputs.test_suite == 'all'
+        run: npx playwright test --project=chromium
+
+      - name: Run Cucumber tests
+        if: github.event_name != 'workflow_dispatch' || inputs.test_suite == 'cucumber' || inputs.test_suite == 'all'
+        run: npm run test:cucumber
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          if-no-files-found: ignore
+          retention-days: 30
