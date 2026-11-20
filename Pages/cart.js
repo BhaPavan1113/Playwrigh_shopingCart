@@ -10,23 +10,14 @@ class cartPage {
 
   async checkoutPage(productName) {
     await this.cartButton.click();
-    await this.cartproducts.first().waitFor({ state: "visible" });
-
-    const cartProductCount = await this.cartproducts.count();
-    let hasProduct = false;
-    for (let i = 0; i < cartProductCount; i++) {
-      const cartProductName = (await this.cartproducts.nth(i).textContent())?.trim();
-      if (cartProductName?.toLowerCase() === productName.trim().toLowerCase()) {
-        hasProduct = true;
-        break;
-      }
+    const cartproducts = await this.cartproducts;
+    const cartProductNames = [];
+    for (let i = 0; i < (await cartproducts.count()); i++) {
+      cartProductNames.push(await cartproducts.nth(i).textContent());
     }
-
-    if (!hasProduct) {
-      throw new Error(`Product "${productName}" was not found in the cart.`);
+    if (cartProductNames.includes(productName)) {
+      await this.checkoutButton.click();
     }
-
-    await this.checkoutButton.click();
     await this.selectCountry.waitFor({ state: 'visible' });
     await this.selectCountry.pressSequentially("ind");
     const dropdown = this.page.locator(".ta-results");
